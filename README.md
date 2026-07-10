@@ -74,5 +74,5 @@ python example.py
 
 ## Acknowledgements
 
-This work builds on the original Nano-vLLM project by Xingkai Yu and nano-vllm-qwen3.6 by DaveByteAI. The Qwen3.5 model weights are distributed separately by Alibaba under their own
+This work builds on the original Nano-vLLM project by Xingkai Yu. The Qwen3.5 model weights are distributed separately by Alibaba under their own
 model terms.
