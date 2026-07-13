@@ -70,7 +70,7 @@ python example.py
 | Inference Engine | Output Tokens | Time (s) | Throughput (tokens/s) |
 |----------------|-------------|----------|-----------------------|
 | vLLM           | 133,966     | 217.35    | 616.34              |
-| Nano-vLLM      | 133,966     | 285.99    | 468.42               |
+| Nano-vLLM      | 133,966     | 272.56    | 491.52               |
 
 ## Acknowledgements
 
