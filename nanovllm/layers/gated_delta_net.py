@@ -6,8 +6,7 @@ import torch.distributed as dist
 from nanovllm.layers.layernorm import RMSNormGated
 from nanovllm.layers.linear import ColumnParallelLinear, RowParallelLinear
 from nanovllm.utils.context import get_context
-
-from fla.ops import chunk_gated_delta_rule, fused_recurrent_gated_delta_rule
+from nanovllm.layers.fused_recurrent import fused_recurrent_gated_delta_rule
 
 import triton
 import triton.language as tl
@@ -193,9 +192,9 @@ class GatedDeltaNet(nn.Module):
         mixed_qkv = torch.cat(conv_outputs, dim=0)
 
         q, k, v = mixed_qkv.split([self.key_dim, self.key_dim, self.value_dim], dim=-1)
-        q = q.reshape(1, -1, self.num_k_heads, self.head_k_dim)
-        k = k.reshape(1, -1, self.num_k_heads, self.head_k_dim)
-        v = v.reshape(1, -1, self.num_v_heads, self.head_v_dim)
+        q = q.reshape(1, -1, self.num_k_heads, self.head_k_dim).contiguous()
+        k = k.reshape(1, -1, self.num_k_heads, self.head_k_dim).contiguous()
+        v = v.reshape(1, -1, self.num_v_heads, self.head_v_dim).contiguous()
 
         a = a.unsqueeze(0)
         b = b.unsqueeze(0)
@@ -204,8 +203,8 @@ class GatedDeltaNet(nn.Module):
             initial_state = None
         else:
             initial_state = self.recurrent_states[state_indices]
-
-        out, new_states = chunk_gated_delta_rule(
+        
+        out, new_states = fused_recurrent_gated_delta_rule(
             q, k, v,
             g=a,
             beta=b,
@@ -245,9 +244,9 @@ class GatedDeltaNet(nn.Module):
 
         mixed_qkv = mixed_qkv.transpose(1, 2)
         q, k, v = mixed_qkv.split([self.key_dim, self.key_dim, self.value_dim], dim=-1)
-        q = q.reshape(B, 1, self.num_k_heads, self.head_k_dim)
-        k = k.reshape(B, 1, self.num_k_heads, self.head_k_dim)
-        v = v.reshape(B, 1, self.num_v_heads, self.head_v_dim)
+        q = q.reshape(B, 1, self.num_k_heads, self.head_k_dim).contiguous()
+        k = k.reshape(B, 1, self.num_k_heads, self.head_k_dim).contiguous()
+        v = v.reshape(B, 1, self.num_v_heads, self.head_v_dim).contiguous()
 
         rec_state = self.recurrent_states[state_indices]
 
