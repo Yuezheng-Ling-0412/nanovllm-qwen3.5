@@ -30,7 +30,7 @@ git clone https://www.modelscope.cn/Qwen/Qwen3.5-9B.git
 ## Installation
 
 Use Python 3.10-3.12 with CUDA-capable PyTorch. Real inference requires GPUs plus
-`torch`, `triton`,  `flash-attn`, `flash-linear-attention`.
+`torch`, `triton`,  `flash-attn`.
 
 ## Quick Start
 
